@@ -2,15 +2,17 @@ use std::collections::HashSet;
 
 #[aoc_generator(day1)]
 fn parse_input(input: &str) -> Vec<i32> {
-    input.lines().map(|l| {
-        let val : i32 = l[1..].parse().unwrap();
+    input
+        .lines()
+        .map(|l| {
+            let val: i32 = l[1..].parse().unwrap();
 
-        if &l[0..1] == "-" {
-            -val
-        } else {
-            val
-        }
-    }).collect()
+            if &l[0..1] == "-" {
+                -val
+            } else {
+                val
+            }
+        }).collect()
 }
 
 #[aoc(day1, part1)]
