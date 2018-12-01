@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use fnv::FnvHashSet;
+use std::collections::HashSet;
 
 #[aoc_generator(day1)]
 fn parse_input(input: &str) -> Vec<i32> {
@@ -13,7 +13,8 @@ fn parse_input(input: &str) -> Vec<i32> {
             } else {
                 val
             }
-        }).collect()
+        })
+        .collect()
 }
 
 #[aoc(day1, part1)]
