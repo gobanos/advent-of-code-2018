@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use fnv::FnvHashSet;
 
 #[aoc_generator(day1)]
 fn parse_input(input: &str) -> Vec<i32> {
@@ -38,6 +39,24 @@ fn part2(freqs: &[i32]) -> i32 {
     unreachable!()
 }
 
+#[aoc(day1, part2, Fnv)]
+fn part2_fnv(freqs: &[i32]) -> i32 {
+    let mut reached = FnvHashSet::default();
+    let mut sum = 0;
+
+    reached.insert(sum);
+
+    for f in freqs.iter().cycle() {
+        sum += f;
+
+        if !reached.insert(sum) {
+            return sum;
+        }
+    }
+
+    unreachable!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -57,5 +76,14 @@ mod tests {
         assert_eq!(part2(&[3, 3, 4, -2, -4]), 10);
         assert_eq!(part2(&[-6, 3, 8, 5, -6]), 5);
         assert_eq!(part2(&[7, 7, -2, -7, -4]), 14);
+    }
+
+    #[test]
+    fn part2_fnv_example() {
+        assert_eq!(part2_fnv(&[1, -2, 3, 1]), 2);
+        assert_eq!(part2_fnv(&[1, -1]), 0);
+        assert_eq!(part2_fnv(&[3, 3, 4, -2, -4]), 10);
+        assert_eq!(part2_fnv(&[-6, 3, 8, 5, -6]), 5);
+        assert_eq!(part2_fnv(&[7, 7, -2, -7, -4]), 14);
     }
 }
