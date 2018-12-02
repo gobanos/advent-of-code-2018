@@ -1,3 +1,5 @@
+use aoc_runner_derive::{aoc_generator, aoc};
+
 use fnv::FnvHashSet;
 use std::collections::HashSet;
 
