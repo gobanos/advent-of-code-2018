@@ -1,24 +1,67 @@
 use fnv::FnvHashSet;
 use std::collections::HashSet;
+use std::error::Error;
 
-#[aoc_generator(day1)]
-fn parse_input(input: &str) -> Vec<i32> {
+#[aoc_generator(day1, part1)]
+fn parse_input(input: &str) -> Result<Vec<i32>, Box<dyn Error>> {
     input
         .lines()
         .map(|l| {
-            let val: i32 = l[1..].parse().unwrap();
+            let val: i32 = l[1..].parse()?;
 
-            if &l[0..1] == "-" {
+            Ok(if &l[0..1] == "-" {
                 -val
             } else {
                 val
-            }
+            })
+        }).collect()
+}
+
+#[aoc_generator(day1, part2)]
+fn parse_input2(input: &str) -> std::result::Result<Vec<i32>, Box<dyn Error>> {
+    input
+        .lines()
+        .map(|l| {
+            let val: i32 = l[1..].parse()?;
+
+            Ok(if &l[0..1] == "-" {
+                -val
+            } else {
+                val
+            })
+        }).collect()
+}
+
+type MyResult<T, E> = Result<T, E>;
+
+#[aoc_generator(day1, part2, Fnv)]
+fn parse_input3(input: &str) -> MyResult<Vec<i32>, Box<dyn Error>> {
+    input
+        .lines()
+        .map(|l| {
+            let val: i32 = l[1..].parse()?;
+
+            Ok(if &l[0..1] == "-" {
+                -val
+            } else {
+                val
+            })
         }).collect()
 }
 
 #[aoc(day1, part1)]
 fn part1(freqs: &[i32]) -> i32 {
     freqs.iter().sum()
+}
+
+#[aoc(day1, part1, Fail)]
+fn fail(_freqs: &[i32]) -> Result<i32, String> {
+    Err(String::from("FAIL"))
+}
+
+#[aoc(day1, part1, Success)]
+fn success(_freqs: &[i32]) -> Result<i32, String> {
+    Ok(42)
 }
 
 #[aoc(day1, part2)]
@@ -40,7 +83,8 @@ fn part2(freqs: &[i32]) -> i32 {
 }
 
 #[aoc(day1, part2, Fnv)]
-fn part2_fnv(freqs: &[i32]) -> i32 {
+fn part2_fnv(freqs: Result<&Vec<i32>, &Box<dyn Error>>) -> i32 {
+    let freqs = freqs.unwrap();
     let mut reached = FnvHashSet::default();
     let mut sum = 0;
 
