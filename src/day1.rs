@@ -1,35 +1,11 @@
 use fnv::FnvHashSet;
 use std::collections::HashSet;
 use std::error::Error;
+use std::num::ParseIntError;
 
-#[aoc_generator(day1, part1)]
-fn parse_input(input: &str) -> Result<Vec<i32>, Box<dyn Error>> {
-    input
-        .lines()
-        .map(|l| {
-            let val: i32 = l[1..].parse()?;
-
-            Ok(if &l[0..1] == "-" {
-                -val
-            } else {
-                val
-            })
-        }).collect()
-}
-
-#[aoc_generator(day1, part2)]
-fn parse_input2(input: &str) -> std::result::Result<Vec<i32>, Box<dyn Error>> {
-    input
-        .lines()
-        .map(|l| {
-            let val: i32 = l[1..].parse()?;
-
-            Ok(if &l[0..1] == "-" {
-                -val
-            } else {
-                val
-            })
-        }).collect()
+#[aoc_generator(day1)]
+fn parse_input(input: &str) -> Result<Vec<i32>, ParseIntError> {
+    input.lines().map(|l| l.parse()).collect()
 }
 
 type MyResult<T, E> = Result<T, E>;
@@ -41,11 +17,7 @@ fn parse_input3(input: &str) -> MyResult<Vec<i32>, Box<dyn Error>> {
         .map(|l| {
             let val: i32 = l[1..].parse()?;
 
-            Ok(if &l[0..1] == "-" {
-                -val
-            } else {
-                val
-            })
+            Ok(if &l[0..1] == "-" { -val } else { val })
         }).collect()
 }
 
@@ -122,12 +94,12 @@ mod tests {
         assert_eq!(part2(&[7, 7, -2, -7, -4]), 14);
     }
 
-    #[test]
-    fn part2_fnv_example() {
-        assert_eq!(part2_fnv(&[1, -2, 3, 1]), 2);
-        assert_eq!(part2_fnv(&[1, -1]), 0);
-        assert_eq!(part2_fnv(&[3, 3, 4, -2, -4]), 10);
-        assert_eq!(part2_fnv(&[-6, 3, 8, 5, -6]), 5);
-        assert_eq!(part2_fnv(&[7, 7, -2, -7, -4]), 14);
-    }
+    //    #[test]
+    //    fn part2_fnv_example() {
+    //        assert_eq!(part2_fnv(&[1, -2, 3, 1]), 2);
+    //        assert_eq!(part2_fnv(&[1, -1]), 0);
+    //        assert_eq!(part2_fnv(&[3, 3, 4, -2, -4]), 10);
+    //        assert_eq!(part2_fnv(&[-6, 3, 8, 5, -6]), 5);
+    //        assert_eq!(part2_fnv(&[7, 7, -2, -7, -4]), 14);
+    //    }
 }
