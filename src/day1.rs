@@ -1,24 +1,10 @@
 use fnv::FnvHashSet;
 use std::collections::HashSet;
-use std::error::Error;
 use std::num::ParseIntError;
 
 #[aoc_generator(day1)]
 fn parse_input(input: &str) -> Result<Vec<i32>, ParseIntError> {
     input.lines().map(|l| l.parse()).collect()
-}
-
-type MyResult<T, E> = Result<T, E>;
-
-#[aoc_generator(day1, part2, Fnv)]
-fn parse_input3(input: &str) -> MyResult<Vec<i32>, Box<dyn Error>> {
-    input
-        .lines()
-        .map(|l| {
-            let val: i32 = l[1..].parse()?;
-
-            Ok(if &l[0..1] == "-" { -val } else { val })
-        }).collect()
 }
 
 #[aoc(day1, part1)]
@@ -55,8 +41,7 @@ fn part2(freqs: &[i32]) -> i32 {
 }
 
 #[aoc(day1, part2, Fnv)]
-fn part2_fnv(freqs: Result<&Vec<i32>, &Box<dyn Error>>) -> i32 {
-    let freqs = freqs.unwrap();
+fn part2_fnv(freqs: &[i32]) -> i32 {
     let mut reached = FnvHashSet::default();
     let mut sum = 0;
 

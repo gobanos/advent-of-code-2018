@@ -7,3 +7,4 @@ authors = ["Grégory Obanos <gregory.obanos@gmail.com>"]
 aoc-runner = "0.2.0-alpha1"
 aoc-runner-derive = "0.2.0-alpha1"
 fnv = "1.0.6"
+chrono = "0.4.6"
