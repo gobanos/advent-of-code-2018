@@ -93,7 +93,10 @@ fn parse(input: &str) -> Result<Vec<Record>, Error> {
     Ok(records)
 }
 
-fn build_map(records: &[Record]) -> HashMap<u32, (Duration, Vec<(NaiveDateTime, NaiveDateTime)>)> {
+type GuardId = u32;
+type GuardRecord = (Duration, Vec<(NaiveDateTime, NaiveDateTime)>);
+
+fn build_map(records: &[Record]) -> Result<HashMap<GuardId, GuardRecord>, &'static str> {
     let mut guard = None;
     let mut start_sleeping = None;
 
@@ -104,23 +107,23 @@ fn build_map(records: &[Record]) -> HashMap<u32, (Duration, Vec<(NaiveDateTime, 
             Action::BeginShift(g) => guard = Some(g),
             Action::FallAsleep => start_sleeping = Some(record.date),
             Action::WakeUp => {
-                let start = start_sleeping.take().unwrap();
-                let sleep_duration = (record.date - start).to_std().unwrap();
-                let entry = map.entry(guard.unwrap()).or_default();
+                let start = start_sleeping.take().ok_or("wake up before start sleeping")?;
+                let sleep_duration = (record.date - start).to_std().map_err(|_| "failed to convert chrono duration to std duration")?;
+                let entry = map.entry(guard.ok_or("wake up with no guard")?).or_default();
                 entry.0 += sleep_duration;
                 entry.1.push((start, record.date));
             }
         }
     }
 
-    map
+    Ok(map)
 }
 
 #[aoc(day4, part1)]
-fn part1(records: &[Record]) -> u32 {
-    let map = build_map(records);
+fn part1(records: &[Record]) -> Result<u32, &'static str> {
+    let map = build_map(records)?;
 
-    let (guard, (_, sessions)) = map.into_iter().max_by_key(|(_, d)| d.0).unwrap();
+    let (guard, (_, sessions)) = map.into_iter().max_by_key(|(_, d)| d.0).ok_or("maximum sleeping session not found")?;
 
     let (min, _) = (0..60)
         .map(|m| {
@@ -131,15 +134,16 @@ fn part1(records: &[Record]) -> u32 {
                     .filter(|&(start, stop)| m >= start.minute() && m < stop.minute())
                     .count(),
             )
-        }).max_by_key(|&(_, t)| t)
-        .unwrap();
+        })
+        .max_by_key(|&(_, t)| t)
+        .ok_or("maximum sleeping minute not found")?;
 
-    guard * min
+    Ok(guard * min)
 }
 
 #[aoc(day4, part2)]
-fn part2(records: &[Record]) -> u32 {
-    let map = build_map(records);
+fn part2(records: &[Record]) -> Result<u32, &'static str> {
+    let map = build_map(records)?;
 
     let (guard, min, _) = map
         .into_iter()
@@ -154,13 +158,18 @@ fn part2(records: &[Record]) -> u32 {
                             .count(),
                     )
                 }).max_by_key(|&(_, t)| t)
-                .unwrap();
+                .ok_or("maximum sleeping session not found")?;
 
-            (guard, min, count)
-        }).max_by_key(|&(_, _, c)| c)
-        .unwrap();
+            Ok((guard, min, count))
+        })
+        .fold( None,|acc, res| match (acc, res) {
+            (None, _) | (Some(Ok(_)), Err(_)) => Some(res),
+            (Some(Err(_)), _) => acc,
+            (Some(Ok((_, _, a))), Ok((_, _, b))) if b > a => Some(res),
+            _ => acc,
+        }).ok_or("maximum sleeping min not found")??;
 
-    guard * min
+    Ok(guard * min)
 }
 
 #[cfg(test)]

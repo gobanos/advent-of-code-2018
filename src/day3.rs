@@ -93,20 +93,18 @@ fn part1(claims: &[Claim]) -> usize {
 }
 
 #[aoc(day3, part2)]
-fn part2(claims: &[Claim]) -> Result<u32, &'static str> {
-    claims
-        .iter()
-        .find_map(|c| {
-            if claims
-                .iter()
-                .filter(|&o| o != c)
-                .all(|o| o.rect.overlaps(&c.rect).is_none())
-            {
-                Some(c.id)
-            } else {
-                None
-            }
-        }).ok_or("Not found")
+fn part2(claims: &[Claim]) -> Option<u32> {
+    claims.iter().find_map(|c| {
+        if claims
+            .iter()
+            .filter(|&o| o != c)
+            .all(|o| o.rect.overlaps(&c.rect).is_none())
+        {
+            Some(c.id)
+        } else {
+            None
+        }
+    })
 }
 
 #[cfg(test)]

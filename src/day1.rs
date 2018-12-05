@@ -3,23 +3,13 @@ use std::collections::HashSet;
 use std::num::ParseIntError;
 
 #[aoc_generator(day1)]
-fn parse_input(input: &str) -> Result<Vec<i32>, ParseIntError> {
+fn parse_input_day1(input: &str) -> Result<Vec<i32>, ParseIntError> {
     input.lines().map(|l| l.parse()).collect()
 }
 
 #[aoc(day1, part1)]
 fn part1(freqs: &[i32]) -> i32 {
     freqs.iter().sum()
-}
-
-#[aoc(day1, part1, Fail)]
-fn fail(_freqs: &[i32]) -> Result<i32, String> {
-    Err(String::from("FAIL"))
-}
-
-#[aoc(day1, part1, Success)]
-fn success(_freqs: &[i32]) -> Result<i32, String> {
-    Ok(42)
 }
 
 #[aoc(day1, part2)]
@@ -29,15 +19,15 @@ fn part2(freqs: &[i32]) -> i32 {
 
     reached.insert(sum);
 
-    for f in freqs.iter().cycle() {
-        sum += f;
+    freqs
+        .iter()
+        .cycle()
+        .take_while(|&&f| {
+            sum += f;
+            reached.insert(sum)
+        }).count();
 
-        if !reached.insert(sum) {
-            return sum;
-        }
-    }
-
-    unreachable!()
+    sum
 }
 
 #[aoc(day1, part2, Fnv)]
@@ -47,15 +37,15 @@ fn part2_fnv(freqs: &[i32]) -> i32 {
 
     reached.insert(sum);
 
-    for f in freqs.iter().cycle() {
-        sum += f;
+    freqs
+        .iter()
+        .cycle()
+        .take_while(|&&f| {
+            sum += f;
+            reached.insert(sum)
+        }).count();
 
-        if !reached.insert(sum) {
-            return sum;
-        }
-    }
-
-    unreachable!()
+    sum
 }
 
 #[cfg(test)]
@@ -79,12 +69,12 @@ mod tests {
         assert_eq!(part2(&[7, 7, -2, -7, -4]), 14);
     }
 
-    //    #[test]
-    //    fn part2_fnv_example() {
-    //        assert_eq!(part2_fnv(&[1, -2, 3, 1]), 2);
-    //        assert_eq!(part2_fnv(&[1, -1]), 0);
-    //        assert_eq!(part2_fnv(&[3, 3, 4, -2, -4]), 10);
-    //        assert_eq!(part2_fnv(&[-6, 3, 8, 5, -6]), 5);
-    //        assert_eq!(part2_fnv(&[7, 7, -2, -7, -4]), 14);
-    //    }
+    #[test]
+    fn part2_fnv_example() {
+        assert_eq!(part2_fnv(&[1, -2, 3, 1]), 2);
+        assert_eq!(part2_fnv(&[1, -1]), 0);
+        assert_eq!(part2_fnv(&[3, 3, 4, -2, -4]), 10);
+        assert_eq!(part2_fnv(&[-6, 3, 8, 5, -6]), 5);
+        assert_eq!(part2_fnv(&[7, 7, -2, -7, -4]), 14);
+    }
 }
