@@ -9,27 +9,24 @@ fn diff(a: u8, b: u8) -> u8 {
 }
 
 #[aoc(day5, part1)]
-fn part1(input: &str) -> usize {
-    reduce(input.trim().as_bytes())
+fn part1(input: &[u8]) -> usize {
+    reduce(input)
 }
 
 #[aoc(day5, part2)]
-fn part2(input: &str) -> Option<usize> {
-    let input = input.trim().as_bytes();
+fn part2(input: &[u8]) -> Option<usize> {
     (b'A'..=b'Z')
         .map(|c| reduce(input.iter().filter(|&&a| a != c && a != c + DIFF)))
         .min()
 }
 
 #[aoc(day5, part1, Stack)]
-fn part1_stack(input: &str) -> usize {
-    stack(input.trim().as_bytes())
+fn part1_stack(input: &[u8]) -> usize {
+    stack(input)
 }
 
 #[aoc(day5, part2, Stack)]
-fn part2_stack(input: &str) -> Option<usize> {
-    let input = input.trim().as_bytes();
-
+fn part2_stack(input: &[u8]) -> Option<usize> {
     (b'A'..=b'Z')
         .map(|c| stack(input.iter().filter(|&&a| a != c && a != c + DIFF)))
         .min()
@@ -87,14 +84,18 @@ fn reduce<'a>(polymer: impl IntoIterator<Item = &'a u8>) -> usize {
 }
 
 fn stack<'a>(polymer: impl IntoIterator<Item = &'a u8>) -> usize {
-    polymer.into_iter().fold(Vec::new(), |mut stack, &unit| {
-        match stack.last() {
-            Some(&other) if diff(other, unit) == DIFF => { stack.pop(); },
-            _ => stack.push(unit),
-        }
+    polymer
+        .into_iter()
+        .fold(Vec::new(), |mut stack, &unit| {
+            match stack.last() {
+                Some(&other) if diff(other, unit) == DIFF => {
+                    stack.pop();
+                }
+                _ => stack.push(unit),
+            }
 
-        stack
-    }).len()
+            stack
+        }).len()
 }
 
 #[cfg(test)]
@@ -103,13 +104,13 @@ mod tests {
 
     #[test]
     fn part1_sample() {
-        assert_eq!(part1("dabAcCaCBAcCcaDA"), 10);
-        assert_eq!(part1_stack("dabAcCaCBAcCcaDA"), 10);
+        assert_eq!(part1(b"dabAcCaCBAcCcaDA"), 10);
+        assert_eq!(part1_stack(b"dabAcCaCBAcCcaDA"), 10);
     }
 
     #[test]
     fn part2_sample() {
-        assert_eq!(part2("dabAcCaCBAcCcaDA"), Some(4));
-        assert_eq!(part2_stack("dabAcCaCBAcCcaDA"), Some(4));
+        assert_eq!(part2(b"dabAcCaCBAcCcaDA"), Some(4));
+        assert_eq!(part2_stack(b"dabAcCaCBAcCcaDA"), Some(4));
     }
 }

@@ -107,9 +107,15 @@ fn build_map(records: &[Record]) -> Result<HashMap<GuardId, GuardRecord>, &'stat
             Action::BeginShift(g) => guard = Some(g),
             Action::FallAsleep => start_sleeping = Some(record.date),
             Action::WakeUp => {
-                let start = start_sleeping.take().ok_or("wake up before start sleeping")?;
-                let sleep_duration = (record.date - start).to_std().map_err(|_| "failed to convert chrono duration to std duration")?;
-                let entry = map.entry(guard.ok_or("wake up with no guard")?).or_default();
+                let start = start_sleeping
+                    .take()
+                    .ok_or("wake up before start sleeping")?;
+                let sleep_duration = (record.date - start)
+                    .to_std()
+                    .map_err(|_| "failed to convert chrono duration to std duration")?;
+                let entry = map
+                    .entry(guard.ok_or("wake up with no guard")?)
+                    .or_default();
                 entry.0 += sleep_duration;
                 entry.1.push((start, record.date));
             }
@@ -123,7 +129,10 @@ fn build_map(records: &[Record]) -> Result<HashMap<GuardId, GuardRecord>, &'stat
 fn part1(records: &[Record]) -> Result<u32, &'static str> {
     let map = build_map(records)?;
 
-    let (guard, (_, sessions)) = map.into_iter().max_by_key(|(_, d)| d.0).ok_or("maximum sleeping session not found")?;
+    let (guard, (_, sessions)) = map
+        .into_iter()
+        .max_by_key(|(_, d)| d.0)
+        .ok_or("maximum sleeping session not found")?;
 
     let (min, _) = (0..60)
         .map(|m| {
@@ -134,8 +143,7 @@ fn part1(records: &[Record]) -> Result<u32, &'static str> {
                     .filter(|&(start, stop)| m >= start.minute() && m < stop.minute())
                     .count(),
             )
-        })
-        .max_by_key(|&(_, t)| t)
+        }).max_by_key(|&(_, t)| t)
         .ok_or("maximum sleeping minute not found")?;
 
     Ok(guard * min)
@@ -161,8 +169,7 @@ fn part2(records: &[Record]) -> Result<u32, &'static str> {
                 .ok_or("maximum sleeping session not found")?;
 
             Ok((guard, min, count))
-        })
-        .fold( None,|acc, res| match (acc, res) {
+        }).fold(None, |acc, res| match (acc, res) {
             (None, _) | (Some(Ok(_)), Err(_)) => Some(res),
             (Some(Err(_)), _) => acc,
             (Some(Ok((_, _, a))), Ok((_, _, b))) if b > a => Some(res),
