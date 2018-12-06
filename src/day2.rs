@@ -1,3 +1,4 @@
+use fnv::FnvHashMap;
 use std::collections::HashMap;
 
 #[aoc(day2, part1)]
@@ -6,6 +7,30 @@ fn part1(input: &str) -> u32 {
         .lines()
         .map(|l| {
             let mut map = HashMap::with_capacity(l.len());
+
+            l.chars().for_each(|c| *map.entry(c).or_insert(0) += 1);
+
+            let twice = map.values().any(|&n| n == 2);
+            let three_times = map.values().any(|&n| n == 3);
+
+            (twice, three_times)
+        }).fold((0, 0), |acc, n| match n {
+            (true, true) => (acc.0 + 1, acc.1 + 1),
+            (true, false) => (acc.0 + 1, acc.1),
+            (false, true) => (acc.0, acc.1 + 1),
+            (false, false) => acc,
+        });
+
+    nb_double * nb_triple
+}
+
+#[aoc(day2, part1, Fnv)]
+fn part1_fnv(input: &str) -> u32 {
+    let (nb_double, nb_triple) = input
+        .lines()
+        .map(|l| {
+            let mut map = FnvHashMap::default();
+            map.reserve(l.len());
 
             l.chars().for_each(|c| *map.entry(c).or_insert(0) += 1);
 

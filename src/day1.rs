@@ -1,19 +1,10 @@
 use fnv::FnvHashSet;
 use std::collections::HashSet;
+use std::num::ParseIntError;
 
 #[aoc_generator(day1)]
-fn parse_input(input: &str) -> Vec<i32> {
-    input
-        .lines()
-        .map(|l| {
-            let val: i32 = l[1..].parse().unwrap();
-
-            if &l[0..1] == "-" {
-                -val
-            } else {
-                val
-            }
-        }).collect()
+fn parse_input_day1(input: &str) -> Result<Vec<i32>, ParseIntError> {
+    input.lines().map(|l| l.parse()).collect()
 }
 
 #[aoc(day1, part1)]
@@ -28,15 +19,15 @@ fn part2(freqs: &[i32]) -> i32 {
 
     reached.insert(sum);
 
-    for f in freqs.iter().cycle() {
-        sum += f;
+    freqs
+        .iter()
+        .cycle()
+        .take_while(|&&f| {
+            sum += f;
+            reached.insert(sum)
+        }).count();
 
-        if !reached.insert(sum) {
-            return sum;
-        }
-    }
-
-    unreachable!()
+    sum
 }
 
 #[aoc(day1, part2, Fnv)]
@@ -46,15 +37,15 @@ fn part2_fnv(freqs: &[i32]) -> i32 {
 
     reached.insert(sum);
 
-    for f in freqs.iter().cycle() {
-        sum += f;
+    freqs
+        .iter()
+        .cycle()
+        .take_while(|&&f| {
+            sum += f;
+            reached.insert(sum)
+        }).count();
 
-        if !reached.insert(sum) {
-            return sum;
-        }
-    }
-
-    unreachable!()
+    sum
 }
 
 #[cfg(test)]
