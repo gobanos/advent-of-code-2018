@@ -86,7 +86,8 @@ fn parse(input: &str) -> Result<Vec<Record>, Error> {
             let action = l[19..].parse()?;
 
             Ok(Record { date, action })
-        }).collect::<Result<Vec<_>, Error>>()?;
+        })
+        .collect::<Result<Vec<_>, Error>>()?;
 
     records.sort();
 
@@ -143,7 +144,8 @@ fn part1(records: &[Record]) -> Result<u32, &'static str> {
                     .filter(|&(start, stop)| m >= start.minute() && m < stop.minute())
                     .count(),
             )
-        }).max_by_key(|&(_, t)| t)
+        })
+        .max_by_key(|&(_, t)| t)
         .ok_or("maximum sleeping minute not found")?;
 
     Ok(guard * min)
@@ -165,16 +167,19 @@ fn part2(records: &[Record]) -> Result<u32, &'static str> {
                             .filter(|&(start, stop)| m >= start.minute() && m < stop.minute())
                             .count(),
                     )
-                }).max_by_key(|&(_, t)| t)
+                })
+                .max_by_key(|&(_, t)| t)
                 .ok_or("maximum sleeping session not found")?;
 
             Ok((guard, min, count))
-        }).fold(None, |acc, res| match (acc, res) {
+        })
+        .fold(None, |acc, res| match (acc, res) {
             (None, _) | (Some(Ok(_)), Err(_)) => Some(res),
             (Some(Err(_)), _) => acc,
             (Some(Ok((_, _, a))), Ok((_, _, b))) if b > a => Some(res),
             _ => acc,
-        }).ok_or("maximum sleeping min not found")??;
+        })
+        .ok_or("maximum sleeping min not found")??;
 
     Ok(guard * min)
 }

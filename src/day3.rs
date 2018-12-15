@@ -70,7 +70,8 @@ fn parse(input: &str) -> Result<Vec<Claim>, Box<dyn Error>> {
                     height,
                 },
             })
-        }).collect()
+        })
+        .collect()
 }
 
 #[aoc(day3, part1)]

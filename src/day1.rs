@@ -25,7 +25,8 @@ fn part2(freqs: &[i32]) -> i32 {
         .take_while(|&&f| {
             sum += f;
             reached.insert(sum)
-        }).count();
+        })
+        .count();
 
     sum
 }
@@ -43,7 +44,8 @@ fn part2_fnv(freqs: &[i32]) -> i32 {
         .take_while(|&&f| {
             sum += f;
             reached.insert(sum)
-        }).count();
+        })
+        .count();
 
     sum
 }

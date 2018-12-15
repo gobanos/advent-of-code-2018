@@ -44,38 +44,40 @@ fn reduce<'a>(polymer: impl IntoIterator<Item = &'a u8>) -> usize {
             break;
         }
 
-        let a = &polymer[i];
-        let b = if let Some(b) = polymer[i + 1..].iter().find(|b| b.get().is_some()) {
+        let current = &polymer[i];
+        let next = if let Some(b) = polymer[i + 1..].iter().find(|b| b.get().is_some()) {
             b
         } else {
             break;
         };
 
-        match (a.get(), b.get()) {
-            (Some(x), Some(y)) => if diff(x.get(), y.get()) == DIFF {
-                a.set(None);
-                b.set(None);
+        match (current.get(), next.get()) {
+            (Some(c), Some(n)) => {
+                if diff(c.get(), n.get()) == DIFF {
+                    current.set(None);
+                    next.set(None);
 
-                i = polymer[..i]
-                    .iter()
-                    .enumerate()
-                    .rev()
-                    .find_map(|(i, a)| if a.get().is_some() { Some(i) } else { None })
-                    .unwrap_or_else(|| {
-                        polymer
-                            .iter()
-                            .enumerate()
-                            .find_map(|(i, a)| if a.get().is_some() { Some(i) } else { None })
-                            .unwrap()
-                    })
-            } else {
-                i = polymer
-                    .iter()
-                    .enumerate()
-                    .skip(i + 1)
-                    .find_map(|(i, a)| if a.get().is_some() { Some(i) } else { None })
-                    .unwrap();
-            },
+                    i = polymer[..i]
+                        .iter()
+                        .enumerate()
+                        .rev()
+                        .find_map(|(i, a)| if a.get().is_some() { Some(i) } else { None })
+                        .unwrap_or_else(|| {
+                            polymer
+                                .iter()
+                                .enumerate()
+                                .find_map(|(i, a)| if a.get().is_some() { Some(i) } else { None })
+                                .unwrap()
+                        })
+                } else {
+                    i = polymer
+                        .iter()
+                        .enumerate()
+                        .skip(i + 1)
+                        .find_map(|(i, a)| if a.get().is_some() { Some(i) } else { None })
+                        .unwrap();
+                }
+            }
             _ => panic!("{}\n{:#?}", i, polymer),
         }
     }
@@ -95,7 +97,8 @@ fn stack<'a>(polymer: impl IntoIterator<Item = &'a u8>) -> usize {
             }
 
             stack
-        }).len()
+        })
+        .len()
 }
 
 #[cfg(test)]

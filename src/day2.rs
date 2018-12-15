@@ -14,7 +14,8 @@ fn part1(input: &str) -> u32 {
             let three_times = map.values().any(|&n| n == 3);
 
             (twice, three_times)
-        }).fold((0, 0), |acc, n| match n {
+        })
+        .fold((0, 0), |acc, n| match n {
             (true, true) => (acc.0 + 1, acc.1 + 1),
             (true, false) => (acc.0 + 1, acc.1),
             (false, true) => (acc.0, acc.1 + 1),
@@ -38,7 +39,8 @@ fn part1_fnv(input: &str) -> u32 {
             let three_times = map.values().any(|&n| n == 3);
 
             (twice, three_times)
-        }).fold((0, 0), |acc, n| match n {
+        })
+        .fold((0, 0), |acc, n| match n {
             (true, true) => (acc.0 + 1, acc.1 + 1),
             (true, false) => (acc.0 + 1, acc.1),
             (false, true) => (acc.0, acc.1 + 1),
