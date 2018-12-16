@@ -1,3 +1,4 @@
+use aoc_runner_derive::aoc;
 use std::cell::Cell;
 use std::num::NonZeroU8;
 

@@ -1,3 +1,4 @@
+use aoc_runner_derive::{aoc, aoc_generator};
 use chrono::NaiveDateTime;
 use chrono::ParseError;
 use chrono::Timelike;

@@ -1,3 +1,4 @@
+use aoc_runner_derive::{aoc, aoc_generator};
 use fnv::FnvHashSet;
 use std::error::Error;
 

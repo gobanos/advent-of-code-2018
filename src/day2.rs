@@ -1,3 +1,4 @@
+use aoc_runner_derive::aoc;
 use fnv::FnvHashMap;
 use std::collections::HashMap;
 
