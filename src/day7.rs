@@ -1,17 +1,17 @@
 use aoc_runner_derive::{aoc, aoc_generator};
-use std::str::FromStr;
-use petgraph::Graph;
-use std::fmt::{self, Display, Debug};
 use petgraph::Direction;
-use std::string::FromUtf8Error;
+use petgraph::Graph;
 use std::cmp::Ordering;
+use std::fmt::{self, Debug, Display};
+use std::str::FromStr;
+use std::string::FromUtf8Error;
 
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 struct Step(u8);
 
 impl Step {
     fn duration(self, base_time: u32) -> u32 {
-        (self.0 - b'A' + 1) as u32 + base_time
+        u32::from(self.0 - b'A' + 1) + base_time
     }
 }
 
@@ -73,7 +73,10 @@ fn part1(graph: &Graph<Step, ()>) -> Result<String, FromUtf8Error> {
     let mut seq = Vec::with_capacity(graph.node_count());
 
     loop {
-        if let Some(i) = remaining.externals(Direction::Incoming).min_by_key(|&i| remaining[i]) {
+        if let Some(i) = remaining
+            .externals(Direction::Incoming)
+            .min_by_key(|&i| remaining[i])
+        {
             seq.push(remaining.remove_node(i).unwrap().0);
         } else {
             break String::from_utf8(seq);
@@ -92,29 +95,38 @@ fn part2_internal(graph: &Graph<Step, ()>, nb_worker: usize, base_time: u32) -> 
     let mut started = Vec::with_capacity(remaining.node_count());
 
     loop {
-        let &mut (ref mut job, ref mut time) = workers.iter_mut().min_by(|a, b| a.1.cmp(&b.1).then_with(|| {
-            match (a.0, b.0) {
-                (Some(_), None) => Ordering::Less,
-                (None, Some(_)) => Ordering::Greater,
-                _ => Ordering::Equal,
-            }
-        })).unwrap();
+        let &mut (ref mut job, ref mut time) = workers
+            .iter_mut()
+            .min_by(|a, b| {
+                a.1.cmp(&b.1).then_with(|| match (a.0, b.0) {
+                    (Some(_), None) => Ordering::Less,
+                    (None, Some(_)) => Ordering::Greater,
+                    _ => Ordering::Equal,
+                })
+            })
+            .unwrap();
 
         if let Some(step) = job.take() {
-            let i = remaining.externals(Direction::Incoming).find(|&i| remaining[i] == step).unwrap();
+            let i = remaining
+                .externals(Direction::Incoming)
+                .find(|&i| remaining[i] == step)
+                .unwrap();
             remaining.remove_node(i);
         };
 
-        if let Some(step) = remaining.externals(Direction::Incoming).map(|i| remaining[i]).filter(|step| !started.contains(step)).min() {
+        if let Some(step) = remaining
+            .externals(Direction::Incoming)
+            .map(|i| remaining[i])
+            .filter(|step| !started.contains(step))
+            .min()
+        {
             started.push(step);
             *job = Some(step);
             *time += step.duration(base_time);
+        } else if remaining.node_count() == 0 {
+            break workers.into_iter().max().unwrap().1;
         } else {
-            if remaining.node_count() == 0 {
-                break workers.into_iter().max().unwrap().1;
-            } else {
-                *time+= 1;
-            }
+            *time += 1;
         }
     }
 }
